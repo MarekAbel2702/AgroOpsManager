@@ -39,7 +39,7 @@ Aplikacja zawiera:
 - alerty serwisowe maszyn,
 - raporty kosztów i wartości magazynu,
 - REST API,
-- dokumentację Swagger/OpenAPI,
+- dokumentację Swagger,
 - testy jednostkowe,
 - testy serwisów biznesowych,
 - testy integracyjne API,
@@ -66,7 +66,8 @@ Widoczne są między innymi:
 - alerty serwisowe,
 - alerty magazynowe.
 
-Dashboard korzysta z rzeczywistych danych z bazy, a nie ze statycznych wartości.
+<img width="2520" height="1181" alt="obraz" src="https://github.com/user-attachments/assets/9afda789-100e-4afc-a5d6-2f1dcc2f5f34" />
+
 
 ---
 
@@ -100,6 +101,9 @@ Przykładowe dane pola:
 - status,
 - notatki.
 
+<img width="2538" height="1003" alt="obraz" src="https://github.com/user-attachments/assets/a76deb87-7ca7-4595-ac61-1d63dc8d6ee4" />
+
+
 ---
 
 ## Moduł maszyn
@@ -121,6 +125,9 @@ Funkcje:
 - ustawianie interwału serwisowego,
 - automatyczne wykrywanie maszyn wymagających serwisu,
 - podgląd historii prac wykonanych maszyną.
+
+<img width="2543" height="885" alt="obraz" src="https://github.com/user-attachments/assets/01052301-9e72-46ac-8e9b-928e2275739a" />
+
 
 ## Moduł magazynu
 
@@ -151,6 +158,9 @@ Funkcje:
 - utomatyczne wykrywanie niskich stanów,
 - wyliczanie wartości magazynu,
 - historia użycia materiału w pracach polowych.
+
+<img width="2529" height="994" alt="obraz" src="https://github.com/user-attachments/assets/2effab2d-a7a5-4415-9de6-0ec567a8e894" />
+
 
 ## Moduł prac polowych
 
@@ -183,6 +193,9 @@ Statusy prac:
 - Completed,
 - Cancelled.
 
+<img width="2535" height="777" alt="obraz" src="https://github.com/user-attachments/assets/0a93c7de-8dc7-47b0-b17e-71fd2e4b41e3" />
+
+
 ## Raporty
 
 Aplikacja zawiera moduł raportów i analityki.
@@ -201,6 +214,9 @@ Raporty pokazują:
 - najdroższe prace polowe.
 
 Raporty są generowane na podstawie rzeczywistych danych zapisanych w bazie.
+
+<img width="2520" height="1284" alt="obraz" src="https://github.com/user-attachments/assets/3daa2d72-c470-49a8-a8d2-d2b9dcedecf7" />
+
 
 ## REST API i Swagger
 
@@ -221,6 +237,9 @@ GET /api/inventory/low-stock
 GET /api/field-works/upcoming
 
 Dzięki Swaggerowi można testować endpointy bezpośrednio z przeglądarki.
+
+<img width="2334" height="1280" alt="obraz" src="https://github.com/user-attachments/assets/cda8fda5-8826-4b9b-aabe-a7c0450f3c1e" />
+
 
 ## Technologie
 
