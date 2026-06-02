@@ -1,0 +1,192 @@
+﻿@model IEnumerable<AgroOpsManager.Core.Entities.InventoryItem>
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Magazyn";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Magazyn</h1>
+        <p class="page-subtitle">
+            Kontrola nawozów, paliwa, nasion, części oraz środków ochrony roślin.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-warning" asp-controller="Inventory" asp-action="LowStock">
+            Niskie stany
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Inventory" asp-action="Create">
+            Dodaj pozycję
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is not null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="filter-card">
+    <form method="get" asp-controller="Inventory" asp-action="Index" class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Szukaj</label>
+            <input type="text"
+                   name="searchTerm"
+                   value="@ViewBag.SearchTerm"
+                   class="form-control"
+                   placeholder="Nazwa lub dostawca" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Kategoria</label>
+            <select name="category" class="form-select">
+                <option value="">Wszystkie</option>
+                @foreach (var category in Enum.GetValues<InventoryCategory>())
+                {
+                    if (ViewBag.Category == category.ToString())
+                    {
+                        <option value="@category" selected>@category</option>
+                    }
+                    else
+                    {
+                        <option value="@category">@category</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check mb-2">
+                @if (ViewBag.LowStockOnly == true)
+                {
+                    <input class="form-check-input" type="checkbox" name="lowStockOnly" value="true" id="lowStockOnly" checked />
+                }
+                else
+                {
+                    <input class="form-check-input" type="checkbox" name="lowStockOnly" value="true" id="lowStockOnly" />
+                }
+
+                <label class="form-check-label" for="lowStockOnly">
+                    Tylko niskie stany
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-outline-primary w-100">
+                Filtruj
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="content-card">
+    <div class="content-card-header">
+        <span>Pozycje magazynowe</span>
+        <span class="text-muted small">@Model.Count() rekordów</span>
+    </div>
+
+    <div class="content-card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info mb-0">
+                Brak pozycji magazynowych spełniających wybrane kryteria.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Kategoria</th>
+                            <th>Ilość</th>
+                            <th>Minimum</th>
+                            <th>Cena jedn.</th>
+                            <th>Wartość</th>
+                            <th>Status</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var stockValue = item.Quantity * item.UnitPrice;
+
+                            <tr>
+                                <td>
+                                    <div class="entity-title">@item.Name</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.SupplierName))
+                                    {
+                                        <div class="small text-muted">@item.SupplierName</div>
+                                    }
+                                </td>
+                                <td>@item.Category</td>
+                                <td>@item.Quantity.ToString("0.##") @item.Unit</td>
+                                <td>@item.MinimumQuantity.ToString("0.##") @item.Unit</td>
+                                <td>@item.UnitPrice.ToString("0.00") zł</td>
+                                <td>@stockValue.ToString("0.00") zł</td>
+                                <td>
+                                    @if (item.IsLowStock())
+                                    {
+                                        <span class="badge bg-danger">Niski stan</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">OK</span>
+                                    }
+
+                                    @if (item.ExpirationDate.HasValue)
+                                    {
+                                        <div class="small text-muted mt-1">
+                                            ważne do: @item.ExpirationDate.Value.ToString("yyyy-MM-dd")
+                                        </div>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-controller="Inventory"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id">
+                                            Szczegóły
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Inventory"
+                                           asp-action="Edit"
+                                           asp-route-id="@item.Id">
+                                            Edytuj
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-danger"
+                                           asp-controller="Inventory"
+                                           asp-action="Delete"
+                                           asp-route-id="@item.Id">
+                                            Usuń
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="5" class="text-end">Łączna wartość widocznych pozycji</th>
+                            <th>
+                                @Model.Sum(x => x.Quantity * x.UnitPrice).ToString("0.00") zł
+                            </th>
+                            <th colspan="2"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
+</div>

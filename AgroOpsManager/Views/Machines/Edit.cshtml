@@ -1,0 +1,47 @@
+﻿@model AgroOpsManager.Web.ViewModels.Machines.MachineFormViewModel
+
+@{
+    ViewData["Title"] = "Edytuj maszynę";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Edytuj maszynę</h1>
+        <p class="page-subtitle">Zmień dane maszyny, status lub parametry serwisowe.</p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="form-page-card">
+    <div class="form-page-header">
+        <h2 class="form-page-title fs-5">@Model.Name</h2>
+        <p class="form-page-subtitle">Aktualizujesz dane istniejącej maszyny.</p>
+    </div>
+
+    <div class="form-page-body">
+        <form asp-controller="Machines" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+
+            <partial name="_MachineForm" model="Model" />
+
+            <div class="form-actions">
+                <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+                    Anuluj
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Zapisz zmiany
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

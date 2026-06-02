@@ -1,0 +1,67 @@
+﻿@model AgroOpsManager.Core.Entities.Machine
+
+@{
+    ViewData["Title"] = "Usuń maszynę";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Usuń maszynę</h1>
+        <p class="page-subtitle">
+            Potwierdź usunięcie maszyny z aktywnej ewidencji.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="danger-zone mb-4">
+    <h2 class="fs-5 fw-bold mb-2">Czy na pewno chcesz usunąć tę maszynę?</h2>
+    <p class="mb-0">
+        Maszyna <strong>@Model.Name</strong> zostanie oznaczona jako usunięta.
+        Historia prac pozostanie w bazie.
+    </p>
+</div>
+
+<div class="details-card mb-4">
+    <div class="details-card-header">
+        Dane usuwanej maszyny
+    </div>
+
+    <div class="details-card-body">
+        <dl class="row details-list">
+            <dt class="col-sm-3">Nazwa</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Typ</dt>
+            <dd class="col-sm-9">@Model.Type</dd>
+
+            <dt class="col-sm-3">Numer seryjny</dt>
+            <dd class="col-sm-9">@Model.SerialNumber</dd>
+
+            <dt class="col-sm-3">Rok produkcji</dt>
+            <dd class="col-sm-9">@Model.ProductionYear</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="Machines" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+            Anuluj
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Usuń maszynę
+        </button>
+    </div>
+</form>

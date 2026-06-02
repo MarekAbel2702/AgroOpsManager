@@ -1,0 +1,315 @@
+﻿@model AgroOpsManager.Web.ViewModels.Reports.ReportsViewModel
+
+@{
+    ViewData["Title"] = "Raporty";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Raporty i analityka</h1>
+        <p class="page-subtitle">
+            Analiza kosztów prac polowych, wartości magazynu oraz statusów operacyjnych.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-primary" asp-controller="FieldWorks" asp-action="Index">
+            Prace polowe
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Inventory" asp-action="Index">
+            Magazyn
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Łączny koszt prac</div>
+                <div class="kpi-value fs-3">@Model.TotalFieldWorksCost.ToString("0.00") zł</div>
+                <div class="small text-muted mt-2">Robocizna + materiały</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Koszt robocizny</div>
+                <div class="kpi-value fs-3">@Model.TotalLaborCost.ToString("0.00") zł</div>
+                <div class="small text-muted mt-2">Suma kosztów operatorów</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Koszt materiałów</div>
+                <div class="kpi-value fs-3">@Model.TotalResourcesCost.ToString("0.00") zł</div>
+                <div class="small text-muted mt-2">Zużycie magazynu w pracach</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Wartość magazynu</div>
+                <div class="kpi-value fs-3">@Model.InventoryValue.ToString("0.00") zł</div>
+                <div class="small text-muted mt-2">Aktualna wartość zapasów</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="content-card">
+            <div class="content-card-body">
+                <div class="text-muted small">Planowane</div>
+                <div class="fs-2 fw-bold">@Model.PlannedFieldWorksCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="content-card">
+            <div class="content-card-body">
+                <div class="text-muted small">W trakcie</div>
+                <div class="fs-2 fw-bold">@Model.InProgressFieldWorksCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="content-card">
+            <div class="content-card-body">
+                <div class="text-muted small">Zakończone</div>
+                <div class="fs-2 fw-bold">@Model.CompletedFieldWorksCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="content-card">
+            <div class="content-card-body">
+                <div class="text-muted small">Anulowane</div>
+                <div class="fs-2 fw-bold">@Model.CancelledFieldWorksCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="content-card mb-4">
+            <div class="content-card-header">
+                <span>Koszty według typu pracy</span>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.CostsByWorkType.Any())
+                {
+                    <div class="empty-state">Brak danych do raportu.</div>
+                }
+                else
+                {
+                    @foreach (var item in Model.CostsByWorkType)
+                    {
+                        <div class="report-row">
+                            <div class="d-flex justify-content-between gap-3 mb-1">
+                                <div>
+                                    <strong>@item.WorkType</strong>
+                                    <div class="small text-muted">@item.Count prac</div>
+                                </div>
+
+                                <div class="text-end">
+                                    <strong>@item.TotalCost.ToString("0.00") zł</strong>
+                                    <div class="small text-muted">@item.Percentage.ToString("0.##")%</div>
+                                </div>
+                            </div>
+
+                            <div class="report-bar">
+                                <div class="report-bar-fill" style="width: @item.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+
+                            <div class="small text-muted mt-1">
+                                Robocizna: @item.LaborCost.ToString("0.00") zł ·
+                                Materiały: @item.ResourcesCost.ToString("0.00") zł
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="content-card-header">
+                <span>Wartość magazynu według kategorii</span>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.InventoryValueByCategory.Any())
+                {
+                    <div class="empty-state">Brak danych magazynowych.</div>
+                }
+                else
+                {
+                    @foreach (var item in Model.InventoryValueByCategory)
+                    {
+                        <div class="report-row">
+                            <div class="d-flex justify-content-between gap-3 mb-1">
+                                <div>
+                                    <strong>@item.Category</strong>
+                                    <div class="small text-muted">@item.Count pozycji</div>
+                                </div>
+
+                                <div class="text-end">
+                                    <strong>@item.TotalValue.ToString("0.00") zł</strong>
+                                    <div class="small text-muted">@item.Percentage.ToString("0.##")%</div>
+                                </div>
+                            </div>
+
+                            <div class="report-bar">
+                                <div class="report-bar-fill warning" style="width: @item.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="content-card mb-4">
+            <div class="content-card-header">
+                <span>Koszty według pola</span>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.CostsByField.Any())
+                {
+                    <div class="empty-state">Brak kosztów przypisanych do pól.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Pole</th>
+                                    <th>Prace</th>
+                                    <th class="text-end">Koszt</th>
+                                    <th class="text-end">zł/ha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.CostsByField)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a asp-controller="Fields" asp-action="Details" asp-route-id="@item.FieldId">
+                                                <strong>@item.FieldName</strong>
+                                            </a>
+                                            <div class="small text-muted">@item.AreaInHectares.ToString("0.##") ha</div>
+                                        </td>
+                                        <td>@item.Count</td>
+                                        <td class="text-end">@item.TotalCost.ToString("0.00") zł</td>
+                                        <td class="text-end">@item.CostPerHectare.ToString("0.00") zł</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="content-card-header">
+                <span>Statusy prac polowych</span>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.FieldWorksByStatus.Any())
+                {
+                    <div class="empty-state">Brak prac polowych.</div>
+                }
+                else
+                {
+                    @foreach (var item in Model.FieldWorksByStatus)
+                    {
+                        <div class="report-row">
+                            <div class="d-flex justify-content-between gap-3 mb-1">
+                                <strong>@item.Status</strong>
+                                <span>@item.Count prac · @item.Percentage.ToString("0.##")%</span>
+                            </div>
+
+                            <div class="report-bar">
+                                <div class="report-bar-fill info" style="width: @item.Percentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-card mt-4">
+    <div class="content-card-header">
+        <span>Najdroższe prace polowe</span>
+        <span class="text-muted small">Top 10</span>
+    </div>
+
+    <div class="content-card-body">
+        @if (!Model.MostExpensiveFieldWorks.Any())
+        {
+            <div class="empty-state">Brak prac do wyświetlenia.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Pole</th>
+                            <th>Typ</th>
+                            <th>Status</th>
+                            <th class="text-end">Robocizna</th>
+                            <th class="text-end">Materiały</th>
+                            <th class="text-end">Razem</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var work in Model.MostExpensiveFieldWorks)
+                        {
+                            <tr>
+                                <td>@work.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                <td>@work.FieldName</td>
+                                <td>@work.WorkType</td>
+                                <td>@work.Status</td>
+                                <td class="text-end">@work.LaborCost.ToString("0.00") zł</td>
+                                <td class="text-end">@work.ResourcesCost.ToString("0.00") zł</td>
+                                <td class="text-end"><strong>@work.TotalCost.ToString("0.00") zł</strong></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary"
+                                       asp-controller="FieldWorks"
+                                       asp-action="Details"
+                                       asp-route-id="@work.FieldWorkId">
+                                        Szczegóły
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

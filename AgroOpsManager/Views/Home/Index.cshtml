@@ -1,0 +1,298 @@
+﻿@model AgroOpsManager.Web.ViewModels.Dashboard.DashboardViewModel
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Dashboard operacyjny</h1>
+        <p class="page-subtitle">
+            Najważniejsze wskaźniki gospodarstwa, alerty i nadchodzące prace.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-primary" asp-controller="FieldWorks" asp-action="Create">
+            Zaplanuj pracę
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Inventory" asp-action="Create">
+            Dodaj zasób
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Aktywne pola</div>
+                <div class="kpi-value">@Model.ActiveFieldsCount</div>
+                <a asp-controller="Fields" asp-action="Index" class="kpi-link">Zobacz pola</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Maszyny</div>
+                <div class="kpi-value">@Model.MachinesCount</div>
+                <a asp-controller="Machines" asp-action="Index" class="kpi-link">Zobacz maszyny</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Planowane prace</div>
+                <div class="kpi-value">@Model.PlannedFieldWorksCount</div>
+                <a asp-controller="FieldWorks" asp-action="Index" class="kpi-link">Zobacz prace</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Zakończone prace</div>
+                <div class="kpi-value">@Model.CompletedFieldWorksCount</div>
+                <a asp-controller="FieldWorks" asp-action="Index" asp-route-status="Completed" class="kpi-link">Zobacz zakończone</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card warning">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Maszyny do serwisu</div>
+                <div class="kpi-value">@Model.MachinesRequiringServiceCount</div>
+                <a asp-controller="Machines" asp-action="ServiceAlerts" class="kpi-link">Zobacz alerty</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card danger">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Niskie stany</div>
+                <div class="kpi-value">@Model.LowStockItemsCount</div>
+                <a asp-controller="Inventory" asp-action="LowStock" class="kpi-link">Zobacz magazyn</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Łączny koszt prac</div>
+                <div class="kpi-value fs-3">@Model.TotalFieldWorksCost.ToString("0.00") zł</div>
+                <a asp-controller="FieldWorks" asp-action="Index" class="kpi-link">Zobacz koszty</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="kpi-card-body">
+                <div class="kpi-label">Wartość magazynu</div>
+                <div class="kpi-value fs-3">@Model.InventoryValue.ToString("0.00") zł</div>
+                <a asp-controller="Inventory" asp-action="Index" class="kpi-link">Zobacz magazyn</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="content-card mb-4">
+            <div class="content-card-header">
+                <span>Najbliższe prace</span>
+                <a asp-controller="FieldWorks" asp-action="Index" class="small">Wszystkie</a>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.UpcomingFieldWorks.Any())
+                {
+                    <div class="text-muted">Brak zaplanowanych prac.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Pole</th>
+                                    <th>Typ</th>
+                                    <th>Maszyna</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var work in Model.UpcomingFieldWorks)
+                                {
+                                    <tr>
+                                        <td>@work.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                        <td><strong>@work.Field.Name</strong></td>
+                                        <td>@work.Type</td>
+                                        <td>@(work.Machine is null ? "Brak" : work.Machine.Name)</td>
+                                        <td>
+                                            @if (work.Status == FieldWorkStatus.Planned)
+                                            {
+                                                <span class="badge bg-secondary">@work.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary">@work.Status</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="content-card-header">
+                <span>Ostatnio zakończone prace</span>
+                <a asp-controller="FieldWorks" asp-action="Index" asp-route-status="Completed" class="small">Wszystkie</a>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.RecentlyCompletedFieldWorks.Any())
+                {
+                    <div class="text-muted">Brak zakończonych prac.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Pole</th>
+                                    <th>Typ</th>
+                                    <th class="text-end">Koszt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var work in Model.RecentlyCompletedFieldWorks)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(work.CompletedAtUtc.HasValue
+                                                                                ? work.CompletedAtUtc.Value.ToLocalTime().ToString("yyyy-MM-dd")
+                                                                                : work.PlannedDate.ToString("yyyy-MM-dd"))
+                                </td>
+                                <td><strong>@work.Field.Name</strong></td>
+                                <td>@work.Type</td>
+                                <td class="text-end">@work.CalculateTotalCost().ToString("0.00") zł</td>
+                            </tr>
+                                                        }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="content-card mb-4">
+            <div class="content-card-header">
+                <span>Alerty serwisowe</span>
+                <a asp-controller="Machines" asp-action="ServiceAlerts" class="small">Wszystkie</a>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.MachinesRequiringService.Any())
+                {
+                    <div class="alert alert-success mb-0">
+                        Brak maszyn wymagających serwisu.
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var machine in Model.MachinesRequiringService)
+                        {
+                            var hoursSinceService = machine.CurrentWorkingHours - machine.WorkingHoursAtLastService;
+                            var exceededBy = hoursSinceService - machine.ServiceIntervalHours;
+
+                            <a class="list-group-item list-group-item-action"
+                               asp-controller="Machines"
+                               asp-action="Details"
+                               asp-route-id="@machine.Id">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <strong>@machine.Name</strong>
+                                    <span class="badge bg-danger">+@exceededBy h</span>
+                                </div>
+                                <div class="small text-muted">
+                                    @hoursSinceService / @machine.ServiceIntervalHours h od ostatniego serwisu
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="content-card-header">
+                <span>Niskie stany magazynu</span>
+                <a asp-controller="Inventory" asp-action="LowStock" class="small">Wszystkie</a>
+            </div>
+
+            <div class="content-card-body">
+                @if (!Model.LowStockItems.Any())
+                {
+                    <div class="alert alert-success mb-0">
+                        Brak niskich stanów magazynowych.
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.LowStockItems)
+                        {
+                            var missingToMinimum = item.MinimumQuantity - item.Quantity;
+
+                            <a class="list-group-item list-group-item-action"
+                               asp-controller="Inventory"
+                               asp-action="Details"
+                               asp-route-id="@item.Id">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <strong>@item.Name</strong>
+                                    @if (missingToMinimum > 0)
+                                    {
+                                        <span class="badge bg-danger">
+                                            brakuje @missingToMinimum.ToString("0.##") @item.Unit
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            minimum
+                                        </span>
+                                    }
+                                </div>
+                                <div class="small text-muted">
+                                    @item.Quantity.ToString("0.##") / @item.MinimumQuantity.ToString("0.##") @item.Unit
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,201 @@
+﻿@model AgroOpsManager.Core.Entities.Field
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Szczegóły pola";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">@Model.Name</h1>
+        <p class="page-subtitle">
+            Szczegóły pola, aktualna uprawa oraz historia prac polowych.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+            Wróć do listy
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Fields" asp-action="Edit" asp-route-id="@Model.Id">
+            Edytuj
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is not null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Dane pola
+            </div>
+
+            <div class="details-card-body">
+                <dl class="row details-list">
+                    <dt class="col-sm-4">Nazwa</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Lokalizacja</dt>
+                    <dd class="col-sm-8">@Model.Location</dd>
+
+                    <dt class="col-sm-4">Powierzchnia</dt>
+                    <dd class="col-sm-8">@Model.AreaInHectares.ToString("0.00") ha</dd>
+
+                    <dt class="col-sm-4">Typ gleby</dt>
+                    <dd class="col-sm-8">@Model.SoilType</dd>
+
+                    <dt class="col-sm-4">Aktualna uprawa</dt>
+                    <dd class="col-sm-8">@Model.CurrentCrop</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Status == FieldStatus.Active)
+                        {
+                            <span class="badge bg-success">@Model.Status</span>
+                        }
+                        else if (Model.Status == FieldStatus.Fallow)
+                        {
+                            <span class="badge bg-warning text-dark">@Model.Status</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@Model.Status</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header d-flex justify-content-between align-items-center">
+                <span>Historia prac polowych</span>
+                <a class="small" asp-controller="FieldWorks" asp-action="Create">
+                    Dodaj pracę
+                </a>
+            </div>
+
+            <div class="details-card-body">
+                @if (!Model.FieldWorks.Any())
+                {
+                    <div class="empty-state">
+                        Brak prac polowych przypisanych do tego pola.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Typ</th>
+                                    <th>Maszyna</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Koszt</th>
+                                    <th class="text-end">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var work in Model.FieldWorks.OrderByDescending(x => x.PlannedDate))
+                                {
+                                    <tr>
+                                        <td>@work.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@work.Type</td>
+                                        <td>@(work.Machine is null ? "Brak" : work.Machine.Name)</td>
+                                        <td>
+                                            @if (work.Status == FieldWorkStatus.Completed)
+                                            {
+                                                <span class="badge bg-success">@work.Status</span>
+                                            }
+                                            else if (work.Status == FieldWorkStatus.InProgress)
+                                            {
+                                                <span class="badge bg-primary">@work.Status</span>
+                                            }
+                                            else if (work.Status == FieldWorkStatus.Cancelled)
+                                            {
+                                                <span class="badge bg-danger">@work.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@work.Status</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">@work.CalculateTotalCost().ToString("0.00") zł</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="FieldWorks"
+                                               asp-action="Details"
+                                               asp-route-id="@work.Id">
+                                                Szczegóły
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Podsumowanie
+            </div>
+
+            <div class="details-card-body">
+                <div class="mb-3">
+                    <div class="text-muted small">Liczba prac</div>
+                    <div class="fs-3 fw-bold">@Model.FieldWorks.Count</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Łączny koszt prac</div>
+                    <div class="fs-4 fw-bold">
+                        @Model.FieldWorks.Sum(x => x.CalculateTotalCost()).ToString("0.00") zł
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-muted small">Koszt na hektar</div>
+                    @{
+                        var totalCost = Model.FieldWorks.Sum(x => x.CalculateTotalCost());
+                        var costPerHectare = Model.AreaInHectares > 0
+                        ? totalCost / Model.AreaInHectares
+                        : 0;
+                    }
+                    <div class="fs-5 fw-bold">
+                        @costPerHectare.ToString("0.00") zł / ha
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Notatki
+            </div>
+
+            <div class="details-card-body">
+                @if (string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="text-muted">Brak notatek.</div>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Notes</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

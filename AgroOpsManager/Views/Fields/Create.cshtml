@@ -1,0 +1,47 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldFormViewModel
+
+@{
+    ViewData["Title"] = "Dodaj pole";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Dodaj pole</h1>
+        <p class="page-subtitle">Utwórz nowe pole uprawne i przygotuj je do planowania prac.</p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="form-page-card">
+    <div class="form-page-header">
+        <h2 class="form-page-title fs-5">Nowe pole uprawne</h2>
+        <p class="form-page-subtitle">Wypełnij podstawowe dane pola.</p>
+    </div>
+
+    <div class="form-page-body">
+        <form asp-controller="Fields" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <partial name="_FieldForm" model="Model" />
+
+            <div class="form-actions">
+                <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+                    Anuluj
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Zapisz pole
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,67 @@
+﻿@model AgroOpsManager.Core.Entities.InventoryItem
+
+@{
+    ViewData["Title"] = "Usuń pozycję magazynową";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Usuń pozycję magazynową</h1>
+        <p class="page-subtitle">
+            Potwierdź usunięcie zasobu z aktywnego magazynu.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Inventory" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="danger-zone mb-4">
+    <h2 class="fs-5 fw-bold mb-2">Czy na pewno chcesz usunąć tę pozycję?</h2>
+    <p class="mb-0">
+        Pozycja <strong>@Model.Name</strong> zostanie oznaczona jako usunięta.
+        Historia użycia w pracach polowych pozostanie w bazie.
+    </p>
+</div>
+
+<div class="details-card mb-4">
+    <div class="details-card-header">
+        Dane usuwanej pozycji
+    </div>
+
+    <div class="details-card-body">
+        <dl class="row details-list">
+            <dt class="col-sm-3">Nazwa</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Kategoria</dt>
+            <dd class="col-sm-9">@Model.Category</dd>
+
+            <dt class="col-sm-3">Ilość</dt>
+            <dd class="col-sm-9">@Model.Quantity.ToString("0.##") @Model.Unit</dd>
+
+            <dt class="col-sm-3">Minimum</dt>
+            <dd class="col-sm-9">@Model.MinimumQuantity.ToString("0.##") @Model.Unit</dd>
+
+            <dt class="col-sm-3">Cena jednostkowa</dt>
+            <dd class="col-sm-9">@Model.UnitPrice.ToString("0.00") zł</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="Inventory" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Inventory" asp-action="Index">
+            Anuluj
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Usuń pozycję
+        </button>
+    </div>
+</form>

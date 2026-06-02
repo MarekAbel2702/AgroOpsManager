@@ -1,0 +1,47 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldWorks.FieldWorkFormViewModel
+
+@{
+    ViewData["Title"] = "Dodaj pracę polową";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Dodaj pracę polową</h1>
+        <p class="page-subtitle">Zaplanuj nową pracę na wybranym polu.</p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="FieldWorks" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="form-page-card">
+    <div class="form-page-header">
+        <h2 class="form-page-title fs-5">Nowa praca polowa</h2>
+        <p class="form-page-subtitle">Wybierz pole, maszynę, typ pracy i koszt robocizny.</p>
+    </div>
+
+    <div class="form-page-body">
+        <form asp-controller="FieldWorks" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <partial name="_FieldWorkForm" model="Model" />
+
+            <div class="form-actions">
+                <a class="btn btn-outline-secondary" asp-controller="FieldWorks" asp-action="Index">
+                    Anuluj
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Zapisz pracę
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

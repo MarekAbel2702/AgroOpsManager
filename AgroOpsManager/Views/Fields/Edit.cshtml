@@ -1,0 +1,47 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldFormViewModel
+
+@{
+    ViewData["Title"] = "Edytuj pole";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Edytuj pole</h1>
+        <p class="page-subtitle">Zmień dane pola, aktualną uprawę lub status.</p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="form-page-card">
+    <div class="form-page-header">
+        <h2 class="form-page-title fs-5">@Model.Name</h2>
+        <p class="form-page-subtitle">Aktualizujesz dane istniejącego pola.</p>
+    </div>
+
+    <div class="form-page-body">
+        <form asp-controller="Fields" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+
+            <partial name="_FieldForm" model="Model" />
+
+            <div class="form-actions">
+                <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+                    Anuluj
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Zapisz zmiany
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

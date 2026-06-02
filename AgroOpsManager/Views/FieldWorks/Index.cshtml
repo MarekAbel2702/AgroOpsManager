@@ -1,0 +1,201 @@
+﻿@model IEnumerable<AgroOpsManager.Core.Entities.FieldWork>
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Prace polowe";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Prace polowe</h1>
+        <p class="page-subtitle">
+            Planowanie, realizacja i rozliczanie prac wykonywanych na polach.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-primary" asp-controller="FieldWorks" asp-action="Create">
+            Dodaj pracę
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is not null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="filter-card">
+    <form method="get" asp-controller="FieldWorks" asp-action="Index" class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Szukaj</label>
+            <input type="text"
+                   name="searchTerm"
+                   value="@ViewBag.SearchTerm"
+                   class="form-control"
+                   placeholder="Pole, maszyna lub operator" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Typ pracy</label>
+            <select name="type" class="form-select">
+                <option value="">Wszystkie</option>
+                @foreach (var type in Enum.GetValues<FieldWorkType>())
+                {
+                    if (ViewBag.Type == type.ToString())
+                    {
+                        <option value="@type" selected>@type</option>
+                    }
+                    else
+                    {
+                        <option value="@type">@type</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="">Wszystkie</option>
+                @foreach (var status in Enum.GetValues<FieldWorkStatus>())
+                {
+                    if (ViewBag.Status == status.ToString())
+                    {
+                        <option value="@status" selected>@status</option>
+                    }
+                    else
+                    {
+                        <option value="@status">@status</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-outline-primary w-100">
+                Filtruj
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="content-card">
+    <div class="content-card-header">
+        <span>Lista prac polowych</span>
+        <span class="text-muted small">@Model.Count() rekordów</span>
+    </div>
+
+    <div class="content-card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info mb-0">
+                Brak prac polowych spełniających wybrane kryteria.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Pole</th>
+                            <th>Typ</th>
+                            <th>Maszyna</th>
+                            <th>Operator</th>
+                            <th>Status</th>
+                            <th class="text-end">Koszt</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var work in Model)
+                        {
+                            <tr>
+                                <td>@work.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <div class="entity-title">@work.Field.Name</div>
+                                    <div class="small text-muted">@work.Field.AreaInHectares.ToString("0.##") ha</div>
+                                </td>
+                                <td>@work.Type</td>
+                                <td>
+                                    @(work.Machine is null ? "Brak" : work.Machine.Name)
+                                </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(work.OperatorName) ? "Brak" : work.OperatorName)
+                                </td>
+                                <td>
+                                    @if (work.Status == FieldWorkStatus.Planned)
+                                    {
+                                        <span class="badge bg-secondary">@work.Status</span>
+                                    }
+                                    else if (work.Status == FieldWorkStatus.InProgress)
+                                    {
+                                        <span class="badge bg-primary">@work.Status</span>
+                                    }
+                                    else if (work.Status == FieldWorkStatus.Completed)
+                                    {
+                                        <span class="badge bg-success">@work.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">@work.Status</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <strong>@work.CalculateTotalCost().ToString("0.00") zł</strong>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-controller="FieldWorks"
+                                           asp-action="Details"
+                                           asp-route-id="@work.Id">
+                                            Szczegóły
+                                        </a>
+
+                                        @if (work.Status != FieldWorkStatus.Completed && work.Status != FieldWorkStatus.Cancelled)
+                                        {
+                                            <a class="btn btn-sm btn-outline-success"
+                                               asp-controller="FieldWorks"
+                                               asp-action="Complete"
+                                               asp-route-id="@work.Id">
+                                                Zakończ
+                                            </a>
+                                        }
+
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="FieldWorks"
+                                           asp-action="Edit"
+                                           asp-route-id="@work.Id">
+                                            Edytuj
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-danger"
+                                           asp-controller="FieldWorks"
+                                           asp-action="Delete"
+                                           asp-route-id="@work.Id">
+                                            Usuń
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="6" class="text-end">Łączny koszt widocznych prac</th>
+                            <th class="text-end">
+                                @Model.Sum(x => x.CalculateTotalCost()).ToString("0.00") zł
+                            </th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
+</div>

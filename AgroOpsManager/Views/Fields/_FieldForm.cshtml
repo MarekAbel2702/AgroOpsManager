@@ -1,0 +1,66 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldFormViewModel
+@using AgroOpsManager.Core.Enums
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="form-section">
+    <div class="form-section-title">Dane podstawowe</div>
+    <p class="form-section-description">
+        Podaj nazwę, lokalizację oraz powierzchnię pola. Te informacje będą używane w raportach i pracach polowych.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="np. Pole Północne" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Location" class="form-label"></label>
+            <input asp-for="Location" class="form-control" placeholder="np. Sektor A" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="AreaInHectares" class="form-label"></label>
+            <input asp-for="AreaInHectares" class="form-control" type="number" step="0.01" placeholder="12,50" />
+            <span asp-validation-for="AreaInHectares" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="SoilType" class="form-label"></label>
+            <select asp-for="SoilType" asp-items="Html.GetEnumSelectList<SoilType>()" class="form-select"></select>
+            <span asp-validation-for="SoilType" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="CurrentCrop" class="form-label"></label>
+            <select asp-for="CurrentCrop" asp-items="Html.GetEnumSelectList<CropType>()" class="form-select"></select>
+            <span asp-validation-for="CurrentCrop" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="form-section-title">Status i notatki</div>
+    <p class="form-section-description">
+        Status określa, czy pole może być używane w planowaniu prac.
+    </p>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" asp-items="Html.GetEnumSelectList<FieldStatus>()" class="form-select"></select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="mb-0">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Dodatkowe informacje o polu..."></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+</div>

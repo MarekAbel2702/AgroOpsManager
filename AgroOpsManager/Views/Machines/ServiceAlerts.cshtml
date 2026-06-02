@@ -1,0 +1,94 @@
+﻿@model IEnumerable<AgroOpsManager.Core.Entities.Machine>
+
+@{
+    ViewData["Title"] = "Alerty serwisowe";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Alerty serwisowe</h1>
+        <p class="page-subtitle">
+            Maszyny, które przekroczyły interwał serwisowy lub wymagają przeglądu.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+            Wróć do maszyn
+        </a>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="content-card-header">
+        <span>Maszyny wymagające serwisu</span>
+        <span class="text-muted small">@Model.Count() rekordów</span>
+    </div>
+
+    <div class="content-card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-success mb-0">
+                Brak maszyn wymagających serwisu.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Maszyna</th>
+                            <th>Typ</th>
+                            <th>Aktualne h</th>
+                            <th>Ostatni serwis</th>
+                            <th>Interwał</th>
+                            <th>Przekroczenie</th>
+                            <th>Status</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var machine in Model)
+                        {
+                            var hoursSinceService = machine.CurrentWorkingHours - machine.WorkingHoursAtLastService;
+                            var exceededBy = hoursSinceService - machine.ServiceIntervalHours;
+
+                            <tr>
+                                <td>
+                                    <div class="entity-title">@machine.Name</div>
+                                    <div class="small text-muted">@machine.SerialNumber</div>
+                                </td>
+                                <td>@machine.Type</td>
+                                <td>@machine.CurrentWorkingHours h</td>
+                                <td>@machine.WorkingHoursAtLastService h</td>
+                                <td>@machine.ServiceIntervalHours h</td>
+                                <td>
+                                    <span class="badge bg-danger">+@exceededBy h</span>
+                                </td>
+                                <td>@machine.Status</td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-controller="Machines"
+                                           asp-action="Details"
+                                           asp-route-id="@machine.Id">
+                                            Szczegóły
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Machines"
+                                           asp-action="Edit"
+                                           asp-route-id="@machine.Id">
+                                            Edytuj
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

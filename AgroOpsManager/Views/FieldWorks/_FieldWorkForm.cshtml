@@ -1,0 +1,83 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldWorks.FieldWorkFormViewModel
+@using AgroOpsManager.Core.Enums
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="form-section">
+    <div class="form-section-title">Zakres pracy</div>
+    <p class="form-section-description">
+        Wybierz pole, typ pracy i planowaną datę realizacji.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="FieldId" class="form-label"></label>
+            <select asp-for="FieldId" asp-items="Model.Fields" class="form-select"></select>
+            <span asp-validation-for="FieldId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="MachineId" class="form-label"></label>
+            <select asp-for="MachineId" asp-items="Model.Machines" class="form-select"></select>
+            <span asp-validation-for="MachineId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" asp-items="Html.GetEnumSelectList<FieldWorkType>()" class="form-select"></select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="PlannedDate" class="form-label"></label>
+            <input asp-for="PlannedDate" class="form-control" type="date" />
+            <span asp-validation-for="PlannedDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" asp-items="Html.GetEnumSelectList<FieldWorkStatus>()" class="form-select"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="form-section-title">Koszty i operator</div>
+    <p class="form-section-description">
+        Koszt robocizny zostanie później zsumowany z kosztem zużytych materiałów.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="LaborCost" class="form-label"></label>
+            <input asp-for="LaborCost" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="LaborCost" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="OperatorName" class="form-label"></label>
+            <input asp-for="OperatorName" class="form-control" placeholder="np. Adam Nowak" />
+            <span asp-validation-for="OperatorName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="alert alert-info mb-0">
+        <strong>Proces:</strong>
+        po utworzeniu pracy możesz ją zakończyć, dodać zużyte materiały i automatycznie zaktualizować magazyn.
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="form-section-title">Notatki</div>
+    <p class="form-section-description">
+        Dodaj szczegóły dotyczące pracy, zaleceń lub warunków wykonania.
+    </p>
+
+    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Dodatkowe informacje o pracy..."></textarea>
+    <span asp-validation-for="Notes" class="text-danger"></span>
+</div>

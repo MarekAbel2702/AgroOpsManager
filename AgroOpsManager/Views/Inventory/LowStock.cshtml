@@ -1,0 +1,104 @@
+﻿@model IEnumerable<AgroOpsManager.Core.Entities.InventoryItem>
+
+@{
+    ViewData["Title"] = "Niskie stany magazynu";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Niskie stany magazynu</h1>
+        <p class="page-subtitle">
+            Pozycje, których aktualny stan jest mniejszy lub równy minimalnemu poziomowi.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Inventory" asp-action="Index">
+            Wróć do magazynu
+        </a>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="content-card-header">
+        <span>Pozycje wymagające uzupełnienia</span>
+        <span class="text-muted small">@Model.Count() rekordów</span>
+    </div>
+
+    <div class="content-card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-success mb-0">
+                Brak niskich stanów magazynowych.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Kategoria</th>
+                            <th>Aktualnie</th>
+                            <th>Minimum</th>
+                            <th>Brakuje</th>
+                            <th>Dostawca</th>
+                            <th class="text-end">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var missingToMinimum = item.MinimumQuantity - item.Quantity;
+
+                            <tr>
+                                <td>
+                                    <div class="entity-title">@item.Name</div>
+                                    <div class="small text-muted">@item.UnitPrice.ToString("0.00") zł / @item.Unit</div>
+                                </td>
+                                <td>@item.Category</td>
+                                <td>@item.Quantity.ToString("0.##") @item.Unit</td>
+                                <td>@item.MinimumQuantity.ToString("0.##") @item.Unit</td>
+                                <td>
+                                    @if (missingToMinimum > 0)
+                                    {
+                                        <span class="badge bg-danger">
+                                            @missingToMinimum.ToString("0.##") @item.Unit
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            stan minimalny
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.SupplierName) ? "Brak" : item.SupplierName)
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-controller="Inventory"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id">
+                                            Szczegóły
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Inventory"
+                                           asp-action="Edit"
+                                           asp-route-id="@item.Id">
+                                            Uzupełnij
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

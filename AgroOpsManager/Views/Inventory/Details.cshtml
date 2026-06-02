@@ -1,0 +1,198 @@
+﻿@model AgroOpsManager.Core.Entities.InventoryItem
+
+@{
+    ViewData["Title"] = "Szczegóły pozycji magazynowej";
+
+    var stockValue = Model.Quantity * Model.UnitPrice;
+    var missingToMinimum = Model.MinimumQuantity - Model.Quantity;
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">@Model.Name</h1>
+        <p class="page-subtitle">
+            Szczegóły zasobu magazynowego, stan, wartość oraz historia użycia.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Inventory" asp-action="Index">
+            Wróć do listy
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Inventory" asp-action="Edit" asp-route-id="@Model.Id">
+            Edytuj
+        </a>
+    </div>
+</div>
+
+@if (Model.IsLowStock())
+{
+    <div class="alert alert-warning">
+        <strong>Niski stan magazynowy.</strong>
+        Aktualna ilość: @Model.Quantity.ToString("0.##") @Model.Unit,
+        minimum: @Model.MinimumQuantity.ToString("0.##") @Model.Unit.
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        Stan magazynowy jest prawidłowy.
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Dane pozycji
+            </div>
+
+            <div class="details-card-body">
+                <dl class="row details-list">
+                    <dt class="col-sm-4">Nazwa</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Kategoria</dt>
+                    <dd class="col-sm-8">@Model.Category</dd>
+
+                    <dt class="col-sm-4">Jednostka</dt>
+                    <dd class="col-sm-8">@Model.Unit</dd>
+
+                    <dt class="col-sm-4">Dostawca</dt>
+                    <dd class="col-sm-8">
+                        @(string.IsNullOrWhiteSpace(Model.SupplierName) ? "Brak" : Model.SupplierName)
+                    </dd>
+
+                    <dt class="col-sm-4">Data ważności</dt>
+                    <dd class="col-sm-8">
+                        @(Model.ExpirationDate.HasValue
+                                                ? Model.ExpirationDate.Value.ToString("yyyy-MM-dd")
+                                                : "Brak")
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Historia użycia w pracach polowych
+            </div>
+
+            <div class="details-card-body">
+                @if (!Model.ResourceUsages.Any())
+                {
+                    <div class="empty-state">
+                        Ten zasób nie był jeszcze używany w żadnej pracy polowej.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data pracy</th>
+                                    <th>Pole</th>
+                                    <th>Typ pracy</th>
+                                    <th>Ilość</th>
+                                    <th class="text-end">Koszt</th>
+                                    <th class="text-end">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var usage in Model.ResourceUsages.OrderByDescending(x => x.FieldWork.PlannedDate))
+                                {
+                                    <tr>
+                                        <td>@usage.FieldWork.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@usage.FieldWork.Field.Name</td>
+                                        <td>@usage.FieldWork.Type</td>
+                                        <td>@usage.QuantityUsed.ToString("0.##") @Model.Unit</td>
+                                        <td class="text-end">@usage.TotalCost.ToString("0.00") zł</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="FieldWorks"
+                                               asp-action="Details"
+                                               asp-route-id="@usage.FieldWorkId">
+                                                Szczegóły
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Stan i wartość
+            </div>
+
+            <div class="details-card-body">
+                <div class="mb-3">
+                    <div class="text-muted small">Aktualna ilość</div>
+                    <div class="fs-3 fw-bold">@Model.Quantity.ToString("0.##") @Model.Unit</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Minimalny stan</div>
+                    <div class="fs-4 fw-bold">@Model.MinimumQuantity.ToString("0.##") @Model.Unit</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Cena jednostkowa</div>
+                    <div class="fs-5 fw-bold">@Model.UnitPrice.ToString("0.00") zł / @Model.Unit</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Wartość zapasu</div>
+                    <div class="fs-4 fw-bold">@stockValue.ToString("0.00") zł</div>
+                </div>
+
+                @if (Model.IsLowStock())
+                {
+                    if (missingToMinimum > 0)
+                    {
+                        <span class="stat-pill">
+                            Brakuje @missingToMinimum.ToString("0.##") @Model.Unit do minimum
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="stat-pill">
+                            Stan na poziomie minimum
+                        </span>
+                    }
+                }
+                else
+                {
+                    <span class="stat-pill">
+                        Stan prawidłowy
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Notatki
+            </div>
+
+            <div class="details-card-body">
+                @if (string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="text-muted">Brak notatek.</div>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Notes</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

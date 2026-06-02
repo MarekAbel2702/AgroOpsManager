@@ -1,0 +1,275 @@
+﻿@model AgroOpsManager.Core.Entities.FieldWork
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Szczegóły pracy polowej";
+
+    var resourcesCost = Model.CalculateResourcesCost();
+    var totalCost = Model.CalculateTotalCost();
+    var costPerHectare = Model.Field.AreaInHectares > 0
+        ? totalCost / Model.Field.AreaInHectares
+        : 0;
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">@Model.Type - @Model.Field.Name</h1>
+        <p class="page-subtitle">
+            Szczegóły pracy, koszty, zużyte materiały oraz status realizacji.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="FieldWorks" asp-action="Index">
+            Wróć do listy
+        </a>
+
+        @if (Model.Status != FieldWorkStatus.Completed && Model.Status != FieldWorkStatus.Cancelled)
+        {
+            <a class="btn btn-success" asp-controller="FieldWorks" asp-action="Complete" asp-route-id="@Model.Id">
+                Zakończ pracę
+            </a>
+        }
+
+        <a class="btn btn-primary" asp-controller="FieldWorks" asp-action="Edit" asp-route-id="@Model.Id">
+            Edytuj
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is not null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] is not null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (Model.Status == FieldWorkStatus.Completed)
+{
+    <div class="alert alert-success">
+        <strong>Praca zakończona.</strong>
+        @(Model.CompletedAtUtc.HasValue
+            ? $"Data zakończenia: {Model.CompletedAtUtc.Value.ToLocalTime():yyyy-MM-dd HH:mm}"
+            : "")
+</div>
+}
+else if (Model.Status == FieldWorkStatus.InProgress)
+{
+    <div class="alert alert-primary">
+        <strong>Praca w trakcie realizacji.</strong>
+    </div>
+}
+else if (Model.Status == FieldWorkStatus.Cancelled)
+{
+    <div class="alert alert-danger">
+        <strong>Praca anulowana.</strong>
+    </div>
+}
+else
+{
+    <div class="alert alert-secondary">
+        <strong>Praca zaplanowana.</strong>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Dane pracy
+            </div>
+
+            <div class="details-card-body">
+                <dl class="row details-list">
+                    <dt class="col-sm-4">Pole</dt>
+                    <dd class="col-sm-8">@Model.Field.Name</dd>
+
+                    <dt class="col-sm-4">Powierzchnia pola</dt>
+                    <dd class="col-sm-8">@Model.Field.AreaInHectares.ToString("0.##") ha</dd>
+
+                    <dt class="col-sm-4">Typ pracy</dt>
+                    <dd class="col-sm-8">@Model.Type</dd>
+
+                    <dt class="col-sm-4">Data planowana</dt>
+                    <dd class="col-sm-8">@Model.PlannedDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-4">Maszyna</dt>
+                    <dd class="col-sm-8">
+                        @(Model.Machine is null ? "Brak" : Model.Machine.Name)
+                    </dd>
+
+                    <dt class="col-sm-4">Operator</dt>
+                    <dd class="col-sm-8">
+                        @(string.IsNullOrWhiteSpace(Model.OperatorName) ? "Brak" : Model.OperatorName)
+                    </dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Status == FieldWorkStatus.Completed)
+                        {
+                            <span class="badge bg-success">@Model.Status</span>
+                        }
+                        else if (Model.Status == FieldWorkStatus.InProgress)
+                        {
+                            <span class="badge bg-primary">@Model.Status</span>
+                        }
+                        else if (Model.Status == FieldWorkStatus.Cancelled)
+                        {
+                            <span class="badge bg-danger">@Model.Status</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@Model.Status</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Rozpoczęto</dt>
+                    <dd class="col-sm-8">
+                        @(Model.StartedAtUtc.HasValue
+                                                ? Model.StartedAtUtc.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                                : "Brak")
+                    </dd>
+
+                    <dt class="col-sm-4">Zakończono</dt>
+                    <dd class="col-sm-8">
+                        @(Model.CompletedAtUtc.HasValue
+                                                ? Model.CompletedAtUtc.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                                : "Brak")
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Zużyte materiały
+            </div>
+
+            <div class="details-card-body">
+                @if (!Model.ResourceUsages.Any())
+                {
+                    <div class="empty-state">
+                        Brak dodanych materiałów do tej pracy.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Materiał</th>
+                                    <th>Ilość</th>
+                                    <th>Cena jedn.</th>
+                                    <th class="text-end">Koszt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var usage in Model.ResourceUsages)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@usage.InventoryItem.Name</strong>
+                                            <div class="small text-muted">@usage.InventoryItem.Category</div>
+                                        </td>
+                                        <td>@usage.QuantityUsed.ToString("0.##") @usage.InventoryItem.Unit</td>
+                                        <td>@usage.UnitPriceAtUsage.ToString("0.00") zł</td>
+                                        <td class="text-end">@usage.TotalCost.ToString("0.00") zł</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Razem materiały</th>
+                                    <th class="text-end">@resourcesCost.ToString("0.00") zł</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Notatki
+            </div>
+
+            <div class="details-card-body">
+                @if (string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="text-muted">Brak notatek.</div>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Notes</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Koszty
+            </div>
+
+            <div class="details-card-body">
+                <div class="mb-3">
+                    <div class="text-muted small">Koszt robocizny</div>
+                    <div class="fs-4 fw-bold">@Model.LaborCost.ToString("0.00") zł</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Koszt materiałów</div>
+                    <div class="fs-4 fw-bold">@resourcesCost.ToString("0.00") zł</div>
+                </div>
+
+                <hr />
+
+                <div class="mb-3">
+                    <div class="text-muted small">Koszt całkowity</div>
+                    <div class="fs-3 fw-bold">@totalCost.ToString("0.00") zł</div>
+                </div>
+
+                <span class="stat-pill">
+                    @costPerHectare.ToString("0.00") zł / ha
+                </span>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Powiązania
+            </div>
+
+            <div class="details-card-body">
+                <div class="d-grid gap-2">
+                    <a class="btn btn-outline-primary"
+                       asp-controller="Fields"
+                       asp-action="Details"
+                       asp-route-id="@Model.FieldId">
+                        Zobacz pole
+                    </a>
+
+                    @if (Model.MachineId.HasValue)
+                    {
+                        <a class="btn btn-outline-primary"
+                           asp-controller="Machines"
+                           asp-action="Details"
+                           asp-route-id="@Model.MachineId">
+                            Zobacz maszynę
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

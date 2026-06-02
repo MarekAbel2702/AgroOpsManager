@@ -1,0 +1,131 @@
+﻿@model AgroOpsManager.Web.ViewModels.FieldWorks.CompleteFieldWorkViewModel
+
+@{
+    ViewData["Title"] = "Zakończ pracę polową";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Zakończ pracę polową</h1>
+        <p class="page-subtitle">
+            Rozlicz materiały użyte podczas pracy i zaktualizuj stan magazynu.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary"
+           asp-controller="FieldWorks"
+           asp-action="Details"
+           asp-route-id="@Model.FieldWorkId">
+            Wróć do szczegółów
+        </a>
+    </div>
+</div>
+
+<div class="details-card mb-4">
+    <div class="details-card-header">
+        Dane pracy
+    </div>
+
+    <div class="details-card-body">
+        <dl class="row details-list">
+            <dt class="col-sm-3">Pole</dt>
+            <dd class="col-sm-9">@Model.FieldName</dd>
+
+            <dt class="col-sm-3">Typ pracy</dt>
+            <dd class="col-sm-9">@Model.WorkType</dd>
+
+            <dt class="col-sm-3">Data planowana</dt>
+            <dd class="col-sm-9">@Model.PlannedDate.ToString("yyyy-MM-dd")</dd>
+
+            <dt class="col-sm-3">Koszt robocizny</dt>
+            <dd class="col-sm-9">@Model.LaborCost.ToString("0.00") zł</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="FieldWorks" asp-action="Complete" asp-route-id="@Model.FieldWorkId" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="FieldWorkId" />
+    <input type="hidden" asp-for="FieldName" />
+    <input type="hidden" asp-for="WorkType" />
+    <input type="hidden" asp-for="PlannedDate" />
+    <input type="hidden" asp-for="LaborCost" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="form-page-card mb-4">
+        <div class="form-page-header">
+            <h2 class="form-page-title fs-5">Zużyte materiały</h2>
+            <p class="form-page-subtitle">
+                Wybierz materiały z magazynu i wpisz zużytą ilość. Puste wiersze zostaną pominięte.
+            </p>
+        </div>
+
+        <div class="form-page-body">
+            @for (var i = 0; i < Model.Resources.Count; i++)
+            {
+                <div class="form-section">
+                    <div class="form-section-title">Materiał @(i + 1)</div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-8 mb-3 mb-md-0">
+                            <label class="form-label">Materiał</label>
+                            <select asp-for="Resources[i].InventoryItemId"
+                                    asp-items="Model.Resources[i].InventoryItems"
+                                    class="form-select">
+                            </select>
+                            <span asp-validation-for="Resources[i].InventoryItemId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Resources[i].QuantityUsed" class="form-label"></label>
+                            <input asp-for="Resources[i].QuantityUsed"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.01" />
+                            <span asp-validation-for="Resources[i].QuantityUsed" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-page-card mb-4">
+        <div class="form-page-header">
+            <h2 class="form-page-title fs-5">Notatki końcowe</h2>
+            <p class="form-page-subtitle">
+                Dodaj podsumowanie wykonanej pracy lub warunki realizacji.
+            </p>
+        </div>
+
+        <div class="form-page-body">
+            <textarea asp-for="CompletionNotes" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="CompletionNotes" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>Uwaga:</strong>
+        po zapisaniu praca zostanie oznaczona jako zakończona, a stany magazynowe zostaną pomniejszone.
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-outline-secondary"
+           asp-controller="FieldWorks"
+           asp-action="Details"
+           asp-route-id="@Model.FieldWorkId">
+            Anuluj
+        </a>
+
+        <button type="submit" class="btn btn-success">
+            Zakończ pracę i rozlicz magazyn
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,165 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    string IsActive(string controllerName, string? actionName = null)
+    {
+        if (!string.Equals(controller, controllerName, StringComparison.OrdinalIgnoreCase))
+        {
+            return "";
+        }
+
+        if (actionName is not null && !string.Equals(action, actionName, StringComparison.OrdinalIgnoreCase))
+        {
+            return "";
+        }
+
+        return "active";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AgroOps Manager</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="app-brand">
+                <a class="app-brand-title" asp-controller="Home" asp-action="Index">
+                    <span class="app-brand-icon">🌾</span>
+                    <span>AgroOps Manager</span>
+                </a>
+                <div class="app-brand-subtitle">
+                    Farm operations platform
+                </div>
+            </div>
+
+            <nav class="app-nav">
+                <div class="app-nav-label">Główne</div>
+
+                <a class="app-nav-link @IsActive("Home", "Index")"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <span class="app-nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("Fields")"
+                   asp-controller="Fields"
+                   asp-action="Index">
+                    <span class="app-nav-icon">🌱</span>
+                    <span>Pola</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("Machines")"
+                   asp-controller="Machines"
+                   asp-action="Index">
+                    <span class="app-nav-icon">🚜</span>
+                    <span>Maszyny</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("Inventory")"
+                   asp-controller="Inventory"
+                   asp-action="Index">
+                    <span class="app-nav-icon">📦</span>
+                    <span>Magazyn</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("FieldWorks")"
+                   asp-controller="FieldWorks"
+                   asp-action="Index">
+                    <span class="app-nav-icon">🗓️</span>
+                    <span>Prace polowe</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("Reports")"
+                   asp-controller="Reports"
+                   asp-action="Index">
+                    <span class="app-nav-icon">📈</span>
+                    <span>Raporty</span>
+                </a>
+
+                <div class="app-nav-label">Alerty</div>
+
+                <a class="app-nav-link @IsActive("Machines", "ServiceAlerts")"
+                   asp-controller="Machines"
+                   asp-action="ServiceAlerts">
+                    <span class="app-nav-icon">🛠️</span>
+                    <span>Serwis maszyn</span>
+                </a>
+
+                <a class="app-nav-link @IsActive("Inventory", "LowStock")"
+                   asp-controller="Inventory"
+                   asp-action="LowStock">
+                    <span class="app-nav-icon">⚠️</span>
+                    <span>Niskie stany</span>
+                </a>
+
+                <div class="app-nav-label">API</div>
+
+                <a class="app-nav-link"
+                   href="/swagger"
+                   target="_blank">
+                    <span class="app-nav-icon">🔌</span>
+                    <span>Swagger API</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="app-main">
+            <header class="app-topbar">
+                <div class="app-topbar-inner">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-outline-primary mobile-menu-button"
+                                type="button"
+                                onclick="toggleSidebar()">
+                            Menu
+                        </button>
+
+                        <div>
+                            <div class="fw-bold">@ViewData["Title"]</div>
+                            <div class="small text-muted">Zarządzanie operacjami gospodarstwa</div>
+                        </div>
+                    </div>
+
+                    <div class="d-none d-md-flex align-items-center gap-3">
+                        <span class="badge bg-success">Development</span>
+                        <span class="text-muted small">@DateTime.Now.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="app-page">
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="footer">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                    <span>&copy; @DateTime.Now.Year AgroOps Manager</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            sidebar.classList.toggle('show');
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

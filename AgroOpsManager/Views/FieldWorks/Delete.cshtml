@@ -1,0 +1,77 @@
+﻿@model AgroOpsManager.Core.Entities.FieldWork
+
+@{
+    ViewData["Title"] = "Usuń pracę polową";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Usuń pracę polową</h1>
+        <p class="page-subtitle">
+            Potwierdź usunięcie pracy z aktywnej listy.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="FieldWorks" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="danger-zone mb-4">
+    <h2 class="fs-5 fw-bold mb-2">Czy na pewno chcesz usunąć tę pracę?</h2>
+    <p class="mb-0">
+        Praca <strong>@Model.Type</strong> dla pola <strong>@Model.Field.Name</strong>
+        zostanie oznaczona jako usunięta.
+    </p>
+</div>
+
+<div class="details-card mb-4">
+    <div class="details-card-header">
+        Dane usuwanej pracy
+    </div>
+
+    <div class="details-card-body">
+        <dl class="row details-list">
+            <dt class="col-sm-3">Pole</dt>
+            <dd class="col-sm-9">@Model.Field.Name</dd>
+
+            <dt class="col-sm-3">Typ pracy</dt>
+            <dd class="col-sm-9">@Model.Type</dd>
+
+            <dt class="col-sm-3">Data planowana</dt>
+            <dd class="col-sm-9">@Model.PlannedDate.ToString("yyyy-MM-dd")</dd>
+
+            <dt class="col-sm-3">Maszyna</dt>
+            <dd class="col-sm-9">
+                @(Model.Machine is null ? "Brak" : Model.Machine.Name)
+            </dd>
+
+            <dt class="col-sm-3">Operator</dt>
+            <dd class="col-sm-9">
+                @(string.IsNullOrWhiteSpace(Model.OperatorName) ? "Brak" : Model.OperatorName)
+            </dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+
+            <dt class="col-sm-3">Koszt</dt>
+            <dd class="col-sm-9">@Model.CalculateTotalCost().ToString("0.00") zł</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="FieldWorks" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions">
+        <a class="btn btn-outline-secondary" asp-controller="FieldWorks" asp-action="Index">
+            Anuluj
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Usuń pracę
+        </button>
+    </div>
+</form>

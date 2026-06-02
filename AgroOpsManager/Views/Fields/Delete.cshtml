@@ -1,0 +1,67 @@
+﻿@model AgroOpsManager.Core.Entities.Field
+
+@{
+    ViewData["Title"] = "Usuń pole";
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">Usuń pole</h1>
+        <p class="page-subtitle">
+            Potwierdź usunięcie pola z aktywnej listy.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+            Wróć do listy
+        </a>
+    </div>
+</div>
+
+<div class="danger-zone mb-4">
+    <h2 class="fs-5 fw-bold mb-2">Czy na pewno chcesz usunąć to pole?</h2>
+    <p class="mb-0">
+        Pole <strong>@Model.Name</strong> zostanie oznaczone jako usunięte.
+        Dane pozostaną w bazie, ale nie będą widoczne na standardowych listach.
+    </p>
+</div>
+
+<div class="details-card mb-4">
+    <div class="details-card-header">
+        Dane usuwanego pola
+    </div>
+
+    <div class="details-card-body">
+        <dl class="row details-list">
+            <dt class="col-sm-3">Nazwa</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Lokalizacja</dt>
+            <dd class="col-sm-9">@Model.Location</dd>
+
+            <dt class="col-sm-3">Powierzchnia</dt>
+            <dd class="col-sm-9">@Model.AreaInHectares.ToString("0.00") ha</dd>
+
+            <dt class="col-sm-3">Uprawa</dt>
+            <dd class="col-sm-9">@Model.CurrentCrop</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="Fields" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Fields" asp-action="Index">
+            Anuluj
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Usuń pole
+        </button>
+    </div>
+</form>

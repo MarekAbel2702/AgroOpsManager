@@ -1,0 +1,90 @@
+﻿@model AgroOpsManager.Web.ViewModels.Machines.MachineFormViewModel
+@using AgroOpsManager.Core.Enums
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="form-section">
+    <div class="form-section-title">Dane identyfikacyjne</div>
+    <p class="form-section-description">
+        Podaj nazwę, typ maszyny, numer seryjny oraz rok produkcji.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="np. John Deere 6155M" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="SerialNumber" class="form-label"></label>
+            <input asp-for="SerialNumber" class="form-control" placeholder="np. JD-6155M-2020-001" />
+            <span asp-validation-for="SerialNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" asp-items="Html.GetEnumSelectList<MachineType>()" class="form-select"></select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="ProductionYear" class="form-label"></label>
+            <input asp-for="ProductionYear" class="form-control" type="number" />
+            <span asp-validation-for="ProductionYear" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" asp-items="Html.GetEnumSelectList<MachineStatus>()" class="form-select"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="form-section-title">Serwis i motogodziny</div>
+    <p class="form-section-description">
+        Na podstawie tych danych system automatycznie wylicza, czy maszyna wymaga serwisu.
+    </p>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="CurrentWorkingHours" class="form-label"></label>
+            <input asp-for="CurrentWorkingHours" class="form-control" type="number" />
+            <span asp-validation-for="CurrentWorkingHours" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="WorkingHoursAtLastService" class="form-label"></label>
+            <input asp-for="WorkingHoursAtLastService" class="form-control" type="number" />
+            <span asp-validation-for="WorkingHoursAtLastService" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="ServiceIntervalHours" class="form-label"></label>
+            <input asp-for="ServiceIntervalHours" class="form-control" type="number" />
+            <span asp-validation-for="ServiceIntervalHours" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="alert alert-info mb-0">
+        <strong>Reguła serwisowa:</strong>
+        maszyna wymaga serwisu, gdy różnica między aktualnymi motogodzinami
+        a motogodzinami ostatniego serwisu jest większa lub równa interwałowi.
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="form-section-title">Notatki</div>
+    <p class="form-section-description">
+        Dodaj informacje o stanie technicznym, wyposażeniu lub historii maszyny.
+    </p>
+
+    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Dodatkowe informacje o maszynie..."></textarea>
+    <span asp-validation-for="Notes" class="text-danger"></span>
+</div>

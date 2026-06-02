@@ -1,0 +1,201 @@
+﻿@model AgroOpsManager.Core.Entities.Machine
+@using AgroOpsManager.Core.Enums
+
+@{
+    ViewData["Title"] = "Szczegóły maszyny";
+
+    var hoursSinceService = Model.CurrentWorkingHours - Model.WorkingHoursAtLastService;
+    var exceededBy = hoursSinceService - Model.ServiceIntervalHours;
+}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title">@Model.Name</h1>
+        <p class="page-subtitle">
+            Szczegóły maszyny, status serwisowy oraz historia prac.
+        </p>
+    </div>
+
+    <div class="page-actions">
+        <a class="btn btn-outline-secondary" asp-controller="Machines" asp-action="Index">
+            Wróć do listy
+        </a>
+
+        <a class="btn btn-primary" asp-controller="Machines" asp-action="Edit" asp-route-id="@Model.Id">
+            Edytuj
+        </a>
+    </div>
+</div>
+
+@if (Model.RequiresService())
+{
+    <div class="alert alert-warning">
+        <strong>Maszyna wymaga serwisu.</strong>
+        Przekroczono interwał serwisowy o @exceededBy godzin.
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        Maszyna nie wymaga aktualnie serwisu.
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Dane maszyny
+            </div>
+
+            <div class="details-card-body">
+                <dl class="row details-list">
+                    <dt class="col-sm-4">Nazwa</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Typ</dt>
+                    <dd class="col-sm-8">@Model.Type</dd>
+
+                    <dt class="col-sm-4">Numer seryjny</dt>
+                    <dd class="col-sm-8">@Model.SerialNumber</dd>
+
+                    <dt class="col-sm-4">Rok produkcji</dt>
+                    <dd class="col-sm-8">@Model.ProductionYear</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Status == MachineStatus.Available)
+                        {
+                            <span class="badge bg-success">@Model.Status</span>
+                        }
+                        else if (Model.Status == MachineStatus.InUse)
+                        {
+                            <span class="badge bg-primary">@Model.Status</span>
+                        }
+                        else if (Model.Status == MachineStatus.InService)
+                        {
+                            <span class="badge bg-warning text-dark">@Model.Status</span>
+                        }
+                        else if (Model.Status == MachineStatus.Broken)
+                        {
+                            <span class="badge bg-danger">@Model.Status</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@Model.Status</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Historia prac
+            </div>
+
+            <div class="details-card-body">
+                @if (!Model.FieldWorks.Any())
+                {
+                    <div class="empty-state">
+                        Brak prac przypisanych do tej maszyny.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Pole</th>
+                                    <th>Typ</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Koszt</th>
+                                    <th class="text-end">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var work in Model.FieldWorks.OrderByDescending(x => x.PlannedDate))
+                                {
+                                    <tr>
+                                        <td>@work.PlannedDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@work.Field.Name</td>
+                                        <td>@work.Type</td>
+                                        <td>@work.Status</td>
+                                        <td class="text-end">@work.CalculateTotalCost().ToString("0.00") zł</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="FieldWorks"
+                                               asp-action="Details"
+                                               asp-route-id="@work.Id">
+                                                Szczegóły
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="details-card mb-4">
+            <div class="details-card-header">
+                Serwis
+            </div>
+
+            <div class="details-card-body">
+                <div class="mb-3">
+                    <div class="text-muted small">Aktualne motogodziny</div>
+                    <div class="fs-3 fw-bold">@Model.CurrentWorkingHours h</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Od ostatniego serwisu</div>
+                    <div class="fs-4 fw-bold">@hoursSinceService h</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Interwał serwisowy</div>
+                    <div class="fs-5 fw-bold">@Model.ServiceIntervalHours h</div>
+                </div>
+
+                @if (Model.RequiresService())
+                {
+                    <span class="stat-pill">
+                        Wymaga serwisu: +@exceededBy h
+                    </span>
+                }
+                else
+                {
+                    var remaining = Model.ServiceIntervalHours - hoursSinceService;
+
+                    <span class="stat-pill">
+                        Do serwisu: @remaining h
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="details-card">
+            <div class="details-card-header">
+                Notatki
+            </div>
+
+            <div class="details-card-body">
+                @if (string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="text-muted">Brak notatek.</div>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Notes</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
