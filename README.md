@@ -256,8 +256,7 @@ Do uruchomienia projektu potrzebne są:
 
 Sprawdzenie wersji .NET:
 
-```powershell
-dotnet --version
+``` dotnet --version ```
 
 Jeżeli narzędzie dotnet ef nie jest zainstalowane, można je dodać poleceniem:
 
