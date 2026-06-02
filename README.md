@@ -4,8 +4,6 @@ AgroOps Manager to aplikacja webowa napisana w ASP.NET Core MVC, służąca do z
 
 Aplikacja umożliwia zarządzanie polami, maszynami, magazynem, pracami polowymi, kosztami, raportami oraz udostępnia wybrane dane przez REST API dokumentowane w Swaggerze.
 
-Projekt został przygotowany jako aplikacja portfolio, pokazująca praktyczne użycie ASP.NET Core MVC, Entity Framework Core, SQL Server, architektury warstwowej, logiki biznesowej, REST API oraz testów automatycznych.
-
 ---
 
 ## Opis projektu
