@@ -8,34 +8,6 @@ Projekt został przygotowany jako aplikacja portfolio, pokazująca praktyczne u�
 
 ---
 
-## Spis treści
-
-- [Opis projektu](#opis-projektu)
-- [Najważniejsze funkcje](#najważniejsze-funkcje)
-- [Dashboard](#dashboard)
-- [Moduł pól](#moduł-pól)
-- [Moduł maszyn](#moduł-maszyn)
-- [Moduł magazynu](#moduł-magazynu)
-- [Moduł prac polowych](#moduł-prac-polowych)
-- [Raporty](#raporty)
-- [REST API i Swagger](#rest-api-i-swagger)
-- [Technologie](#technologie)
-- [Architektura projektu](#architektura-projektu)
-- [Główne encje domenowe](#główne-encje-domenowe)
-- [Logika biznesowa](#logika-biznesowa)
-- [Baza danych](#baza-danych)
-- [Migracje bazy danych](#migracje-bazy-danych)
-- [Uruchomienie aplikacji](#uruchomienie-aplikacji)
-- [Uruchomienie testów](#uruchomienie-testów)
-- [Zakres testów](#zakres-testów)
-- [Przykładowe endpointy API](#przykładowe-endpointy-api)
-- [Zrzuty ekranu](#zrzuty-ekranu)
-- [Co pokazuje ten projekt](#co-pokazuje-ten-projekt)
-- [Możliwe dalsze usprawnienia](#możliwe-dalsze-usprawnienia)
-- [Autor](#autor)
-
----
-
 ## Opis projektu
 
 AgroOps Manager to system wspierający zarządzanie gospodarstwem rolnym.
@@ -152,7 +124,7 @@ Funkcje:
 - automatyczne wykrywanie maszyn wymagających serwisu,
 - podgląd historii prac wykonanych maszyną.
 
-Moduł magazynu
+## Moduł magazynu
 
 Moduł magazynu pozwala kontrolować zasoby wykorzystywane w gospodarstwie.
 
@@ -182,7 +154,7 @@ Funkcje:
 - wyliczanie wartości magazynu,
 - historia użycia materiału w pracach polowych.
 
-Moduł prac polowych
+## Moduł prac polowych
 
 Moduł prac polowych jest głównym modułem biznesowym aplikacji.
 
@@ -213,7 +185,7 @@ Statusy prac:
 - Completed,
 - Cancelled.
 
-Raporty
+## Raporty
 
 Aplikacja zawiera moduł raportów i analityki.
 
@@ -232,11 +204,11 @@ Raporty pokazują:
 
 Raporty są generowane na podstawie rzeczywistych danych zapisanych w bazie.
 
-REST API i Swagger
+## REST API i Swagger
 
 Aplikacja udostępnia wybrane dane przez REST API.
 
-Swagger/OpenAPI jest dostępny w środowisku developerskim pod adresem:
+Swagger jest dostępny w środowisku developerskim pod adresem:
 
 /swagger
 
@@ -252,7 +224,7 @@ GET /api/field-works/upcoming
 
 Dzięki Swaggerowi można testować endpointy bezpośrednio z przeglądarki.
 
-Technologie
+## Technologie
 
 W projekcie użyto:
 
@@ -295,7 +267,7 @@ Jeżeli jest już zainstalowane, można je zaktualizować:
 
 ```dotnet tool update --global dotnet-ef
 
-2. Pobranie projektu
+## 2. Pobranie projektu
 
 Po sklonowaniu repozytorium przejdź do głównego folderu projektu, czyli folderu zawierającego plik:
 
@@ -304,12 +276,14 @@ AgroOpsManager.sln
 Przykład:
 
 cd AgroOpsManager
-3. Przywrócenie paczek NuGet
+
+## 3. Przywrócenie paczek NuGet
 
 W głównym folderze rozwiązania uruchom:
 
 dotnet restore
-4. Konfiguracja połączenia z bazą danych
+
+## 4. Konfiguracja połączenia z bazą danych
 
 Connection string znajduje się w pliku:
 
@@ -330,7 +304,8 @@ Alternatywnie można użyć lokalnego SQL Servera:
     "DefaultConnection": "Data Source=localhost;Database=AgroOpsManagerDb;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"
   }
 }
-5. Utworzenie migracji
+
+## 5. Utworzenie migracji
 
 Jeżeli migracja nie istnieje jeszcze w projekcie, utwórz ją poleceniem:
 
@@ -338,7 +313,7 @@ dotnet ef migrations add InitialCreate --project ".\AgroOpsManager.Infrastructur
 
 Jeżeli migracja już istnieje, ten krok można pominąć.
 
-6. Utworzenie lub aktualizacja bazy danych
+## 6. Utworzenie lub aktualizacja bazy danych
 
 Uruchom:
 
@@ -353,7 +328,8 @@ maszyny,
 pozycje magazynowe,
 przykładową pracę polową,
 przykładowe zużycie materiału.
-7. Uruchomienie aplikacji
+
+## 7. Uruchomienie aplikacji
 
 W głównym folderze rozwiązania uruchom:
 
@@ -365,7 +341,7 @@ https://localhost:7000
 
 Otwórz ten adres w przeglądarce.
 
-8. Swagger API
+## 8. Swagger API
 
 Dokumentacja API jest dostępna pod adresem:
 
@@ -380,7 +356,7 @@ GET /api/fields/{id}
 GET /api/machines/service-alerts
 GET /api/inventory/low-stock
 GET /api/field-works/upcoming
-10. Uruchomienie testów
+## 9. Uruchomienie testów
 
 Aby uruchomić wszystkie testy, użyj:
 
