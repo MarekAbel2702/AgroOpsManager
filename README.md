@@ -260,11 +260,11 @@ Sprawdzenie wersji .NET:
 
 Jeżeli narzędzie dotnet ef nie jest zainstalowane, można je dodać poleceniem:
 
-```dotnet tool install --global dotnet-ef
+```dotnet tool install --global dotnet-ef ```
 
 Jeżeli jest już zainstalowane, można je zaktualizować:
 
-```dotnet tool update --global dotnet-ef
+```dotnet tool update --global dotnet-ef ```
 
 ## 2. Pobranie projektu
 
@@ -274,13 +274,13 @@ AgroOpsManager.sln
 
 Przykład:
 
-cd AgroOpsManager
+``` cd AgroOpsManager ```
 
 ## 3. Przywrócenie paczek NuGet
 
 W głównym folderze rozwiązania uruchom:
 
-dotnet restore
+``` dotnet restore ```
 
 ## 4. Konfiguracja połączenia z bazą danych
 
@@ -289,35 +289,35 @@ Connection string znajduje się w pliku:
 AgroOpsManager/appsettings.json
 
 Przykładowa konfiguracja dla SQL Server LocalDB:
-
+```
 {
   "ConnectionStrings": {
     "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=AgroOpsManagerDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
   }
 }
-
+```
 Alternatywnie można użyć lokalnego SQL Servera:
-
+```
 {
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=localhost;Database=AgroOpsManagerDb;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"
   }
 }
-
+```
 ## 5. Utworzenie migracji
 
 Jeżeli migracja nie istnieje jeszcze w projekcie, utwórz ją poleceniem:
-
+```
 dotnet ef migrations add InitialCreate --project ".\AgroOpsManager.Infrastructure\AgroOpsManager.Infrastructure.csproj" --startup-project ".\AgroOpsManager\AgroOpsManager.Web.csproj" --output-dir "Data\Migrations"
-
+```
 Jeżeli migracja już istnieje, ten krok można pominąć.
 
 ## 6. Utworzenie lub aktualizacja bazy danych
 
 Uruchom:
-
+```
 dotnet ef database update --project ".\AgroOpsManager.Infrastructure\AgroOpsManager.Infrastructure.csproj" --startup-project ".\AgroOpsManager\AgroOpsManager.Web.csproj"
-
+```
 Polecenie utworzy bazę danych oraz tabele na podstawie migracji.
 
 Po pierwszym uruchomieniu aplikacja automatycznie doda przykładowe dane startowe, między innymi:
@@ -331,21 +331,21 @@ przykładowe zużycie materiału.
 ## 7. Uruchomienie aplikacji
 
 W głównym folderze rozwiązania uruchom:
-
+```
 dotnet run --project ".\AgroOpsManager\AgroOpsManager.Web.csproj"
-
+```
 Po uruchomieniu w konsoli pojawi się adres aplikacji, np.:
-
+```
 https://localhost:7000
-
+```
 Otwórz ten adres w przeglądarce.
 
 ## 8. Swagger API
 
 Dokumentacja API jest dostępna pod adresem:
-
+```
 /swagger
-
+```
 Przykładowe endpointy:
 
 GET /api/health-check
@@ -355,12 +355,13 @@ GET /api/fields/{id}
 GET /api/machines/service-alerts
 GET /api/inventory/low-stock
 GET /api/field-works/upcoming
+
 ## 9. Uruchomienie testów
 
 Aby uruchomić wszystkie testy, użyj:
-
+```
 dotnet test
-
+```
 Projekt zawiera:
 
 testy jednostkowe encji domenowych,
